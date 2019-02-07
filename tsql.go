@@ -65,6 +65,18 @@ func (c *Client) Like(value string, percentSign bool) *Client {
 	return c
 }
 
+func (c *Client) NotLike(value string, percentSign bool) *Client {
+	if c.Query == "" {
+		handleTSQLError("NOT LIKE")
+	}
+	if percentSign {
+		c.Query += " NOT LIKE \"%"+value+"%\""
+	} else {
+		c.Query += " NOT LIKE \""+value+"\""
+	}
+	return c
+}
+
 func (c *Client) LT(value string, quotes bool) *Client {
 	if c.Query == "" {
 		handleTSQLError("<")
@@ -166,6 +178,22 @@ func (c *Client) GroupBy(vals ...interface{}) *Client {
 	if ql > 0 && c.Query[ql-1] == ',' {
 		c.Query = c.Query[:ql-1]
 	}
+	return c
+}
+
+func (c *Client) Limit(amount string) *Client {
+	if c.Query == "" {
+		handleTSQLError("LIMIT")
+	}
+	c.Query += " LIMIT " + amount
+	return c
+}
+
+func (c *Client) Offset(number string) *Client {
+	if c.Query == "" {
+		handleTSQLError("OFFSET")
+	}
+	c.Query += " OFFSET " + number
 	return c
 }
 
