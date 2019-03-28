@@ -270,7 +270,9 @@ func (c *Client) QueryResult(debug bool) (*sql.Rows, error) {
 	query, err := c.Database.Query(c.Query)
 	if debug {
 		log.Println(c.Query)
-		log.Println(err.Error())
+		if err != nil {
+			log.Println(err.Error())
+		}
 	}
 	if err != nil {
 		return nil, err
