@@ -258,12 +258,14 @@ func (c *Client) Execute(debug bool) (sql.Result, error) {
 	r, err := c.Database.Exec(c.Query)
 	if debug {
 		log.Println(c.Query)
-		log.Println(err.Error())
+		if err != nil {
+			log.Println(err.Error())
+		}
 	}
 	if err != nil {
 		return nil, err
 	}
-	return r, err
+	return r, nil
 }
 
 func (c *Client) QueryResult(debug bool) (*sql.Rows, error) {
@@ -277,5 +279,5 @@ func (c *Client) QueryResult(debug bool) (*sql.Rows, error) {
 	if err != nil {
 		return nil, err
 	}
-	return query, err
+	return query, nil
 }
