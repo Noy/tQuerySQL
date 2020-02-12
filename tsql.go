@@ -46,9 +46,9 @@ func (c *Client) Equals(value string, quotes bool) *Client {
 		handleTSQLError("EQUALS")
 	}
 	if quotes {
-		c.Query += " = \""+value+"\""
+		c.Query += " = '"+value+"'"
 	} else {
-		c.Query += " = \""+value+"\""
+		c.Query += " = '"+value+"'"
 	}
 	return c
 }
@@ -58,9 +58,9 @@ func (c *Client) Like(value string, percentSign bool) *Client {
 		handleTSQLError("LIKE")
 	}
 	if percentSign {
-		c.Query += " LIKE \"%"+value+"%\""
+		c.Query += " LIKE '%"+value+"%'"
 	} else {
-		c.Query += " LIKE \""+value+"\""
+		c.Query += " LIKE '"+value+"'"
 	}
 	return c
 }
@@ -70,9 +70,9 @@ func (c *Client) NotLike(value string, percentSign bool) *Client {
 		handleTSQLError("NOT LIKE")
 	}
 	if percentSign {
-		c.Query += " NOT LIKE \"%"+value+"%\""
+		c.Query += " NOT LIKE '%"+value+"%'"
 	} else {
-		c.Query += " NOT LIKE \""+value+"\""
+		c.Query += " NOT LIKE '"+value+"'"
 	}
 	return c
 }
@@ -82,7 +82,7 @@ func (c *Client) LT(value string, quotes bool) *Client {
 		handleTSQLError("<")
 	}
 	if quotes {
-		c.Query += " < \"" + value + "\""
+		c.Query += " < '" + value + "'"
 	} else {
 		c.Query += " < " + value
 	}
@@ -94,7 +94,7 @@ func (c *Client) GT(value string, quotes bool) *Client {
 		handleTSQLError(">")
 	}
 	if quotes {
-		c.Query += " > \"" + value + "\""
+		c.Query += " > '" + value + "'"
 	} else {
 		c.Query += " > " + value
 	}
@@ -106,7 +106,7 @@ func (c *Client) GTE(value string, quotes bool) *Client {
 		handleTSQLError(">=")
 	}
 	if quotes {
-		c.Query += " >= \"" + value + "\""
+		c.Query += " >= '" + value + "'"
 	} else {
 		c.Query += " >= " + value
 	}
@@ -118,7 +118,7 @@ func (c *Client) LTE(value string, quotes bool) *Client {
 		handleTSQLError("<=")
 	}
 	if quotes {
-		c.Query += " <= \"" + value + "\""
+		c.Query += " <= '" + value + "'"
 	} else {
 		c.Query += " <= " + value
 	}
