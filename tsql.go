@@ -48,7 +48,7 @@ func (c *Client) Equals(value string, quotes bool) *Client {
 	if quotes {
 		c.Query += " = '"+value+"'"
 	} else {
-		c.Query += " = '"+value+"'"
+		c.Query += " = "+value+""
 	}
 	return c
 }
@@ -60,7 +60,7 @@ func (c *Client) Like(value string, percentSign bool) *Client {
 	if percentSign {
 		c.Query += " LIKE '%"+value+"%'"
 	} else {
-		c.Query += " LIKE '"+value+"'"
+		c.Query += " LIKE "+value+""
 	}
 	return c
 }
@@ -280,4 +280,18 @@ func (c *Client) QueryResult(debug bool) (*sql.Rows, error) {
 		return nil, err
 	}
 	return query, nil
+}
+
+// Functions
+
+func (c *Client) Lower(val string, quotes bool) *Client {
+	if c.Query == "" {
+		handleTSQLError("LOWER")
+	}
+	if quotes {
+		c.Query += " LOWER('" + val + "')"
+	} else {
+		c.Query += " LOWER(" + val + ")"
+	}
+	return c
 }
