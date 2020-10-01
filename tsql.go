@@ -5,6 +5,7 @@ package tsql
 
 import (
 	"database/sql"
+	utils "github.com/TrafficLabel/Go-Utilities"
 	_ "github.com/go-sql-driver/mysql"
 	"log"
 )
@@ -74,6 +75,14 @@ func (c *Client) NotLike(value string, percentSign bool) *Client {
 	} else {
 		c.Query += " NOT LIKE '"+value+"'"
 	}
+	return c
+}
+
+func (c *Client) NotEqual(value int) *Client {
+	if c.Query == "" {
+		handleTSQLError("NOT EQUAL")
+	}
+	c.Query += " != " + utils.String(value)
 	return c
 }
 
