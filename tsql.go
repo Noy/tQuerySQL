@@ -259,6 +259,54 @@ func (c *Client) Values(values ...string) *Client {
 	return c
 }
 
+func (c *Client) Join(table string) *Client {
+	if c.Query == "" {
+		handleTSQLError("JOIN")
+	}
+	c.Query += " JOIN " + table
+	return c
+}
+
+func (c *Client) LeftOuterJoin(table string) *Client {
+	if c.Query == "" {
+		handleTSQLError("LEFT OUTER JOIN")
+	}
+	c.Query += " LEFT OUTER JOIN " + table
+	return c
+}
+
+func (c *Client) LeftInnerJoin(table string) *Client {
+	if c.Query == "" {
+		handleTSQLError("LEFT INNER JOIN")
+	}
+	c.Query += " LEFT INNER JOIN " + table
+	return c
+}
+
+func (c *Client) RightOuterJoin(table string) *Client {
+	if c.Query == "" {
+		handleTSQLError("RIGHT OUTER JOIN")
+	}
+	c.Query += " RIGHT OUTER JOIN " + table
+	return c
+}
+
+func (c *Client) RightInnerJoin(table string) *Client {
+	if c.Query == "" {
+		handleTSQLError("RIGHT INNER JOIN")
+	}
+	c.Query += " RIGHT INNER JOIN " + table
+	return c
+}
+
+func (c *Client) On(val string) *Client {
+	if c.Query == "" {
+		handleTSQLError("ON")
+	}
+	c.Query += " ON " + val
+	return c
+}
+
 func handleTSQLError(queryType string) {
 	panic("You have an error in your sql syntax. '"+queryType+"' should not be here.")
 }
