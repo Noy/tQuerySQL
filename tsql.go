@@ -26,184 +26,135 @@ func (c *Client) Select(value string) *Client {
 	return c
 }
 
-func (c *Client) From(table string) *Client {
+func (c *Client) handleBasicQuerySubmission(queryType, queryStr string) *Client {
 	if c.Query == "" {
-		handleTSQLError("FROM")
+		handleTSQLError(queryType)
+	} else {
+		c.Query += queryStr
 	}
-	c.Query += " FROM " + table
 	return c
+}
+
+func (c *Client) From(table string) *Client {
+	return c.handleBasicQuerySubmission("FROM", " FROM " + table)
 }
 
 func (c *Client) Where(value string) *Client {
-	if c.Query == "" {
-		handleTSQLError("WHERE")
-	}
-	c.Query += " WHERE " + value
-	return c
+	return c.handleBasicQuerySubmission("WHERE", " WHERE " + value)
 }
 
 func (c *Client) Equals(value string, quotes bool) *Client {
-	if c.Query == "" {
-		handleTSQLError("EQUALS")
-	}
 	if quotes {
-		c.Query += " = '"+value+"'"
+		return c.handleBasicQuerySubmission("EQUALS", " = '"+value+"'")
 	} else {
-		c.Query += " = "+value+""
+		return c.handleBasicQuerySubmission("EQUALS", " = "+value+"")
 	}
-	return c
 }
 
 func (c *Client) Like(value string, percentSign bool) *Client {
-	if c.Query == "" {
-		handleTSQLError("LIKE")
-	}
 	if percentSign {
-		c.Query += " LIKE '%"+value+"%'"
+		return c.handleBasicQuerySubmission("LIKE", " LIKE '%"+value+"%'")
 	} else {
-		c.Query += " LIKE "+value+""
+		return c.handleBasicQuerySubmission("LIKE", " LIKE "+value)
 	}
-	return c
 }
 
 func (c *Client) NotLike(value string, percentSign bool) *Client {
-	if c.Query == "" {
-		handleTSQLError("NOT LIKE")
-	}
 	if percentSign {
-		c.Query += " NOT LIKE '%"+value+"%'"
+		return c.handleBasicQuerySubmission("NOT LIKE", " NOT LIKE '%"+value+"%'")
 	} else {
-		c.Query += " NOT LIKE '"+value+"'"
+		return c.handleBasicQuerySubmission("NOT LIKE", " NOT LIKE '"+value+"'")
 	}
-	return c
 }
 
 func (c *Client) NotEqual(value int) *Client {
-	if c.Query == "" {
-		handleTSQLError("NOT EQUAL")
-	}
-	c.Query += " != " + utils.String(value)
-	return c
+	return c.handleBasicQuerySubmission("NOT EQUAL (!=)", " != " + utils.String(value))
 }
 
 func (c *Client) LT(value string, quotes bool) *Client {
-	if c.Query == "" {
-		handleTSQLError("<")
-	}
 	if quotes {
-		c.Query += " < '" + value + "'"
+		return c.handleBasicQuerySubmission("< (less than)", " < '" + value + "'")
 	} else {
-		c.Query += " < " + value
+		return c.handleBasicQuerySubmission("< (less than)", " < " + value)
 	}
-	return c
 }
 
 func (c *Client) GT(value string, quotes bool) *Client {
-	if c.Query == "" {
-		handleTSQLError(">")
-	}
 	if quotes {
-		c.Query += " > '" + value + "'"
+		return c.handleBasicQuerySubmission("> (more than)", " > '" + value + "'")
 	} else {
-		c.Query += " > " + value
+		return c.handleBasicQuerySubmission("> (more than)", " > " + value)
 	}
-	return c
 }
 
 func (c *Client) GTE(value string, quotes bool) *Client {
-	if c.Query == "" {
-		handleTSQLError(">=")
-	}
 	if quotes {
-		c.Query += " >= '" + value + "'"
+		return c.handleBasicQuerySubmission(">= (GTE)", " >= '" + value + "'")
 	} else {
-		c.Query += " >= " + value
+		return c.handleBasicQuerySubmission(">= (GTE)", " >= " + value)
 	}
-	return c
 }
 
 func (c *Client) LTE(value string, quotes bool) *Client {
-	if c.Query == "" {
-		handleTSQLError("<=")
-	}
 	if quotes {
-		c.Query += " <= '" + value + "'"
+		return c.handleBasicQuerySubmission("<= (LTE)", " <= '" + value + "'")
 	} else {
-		c.Query += " <= " + value
+		return c.handleBasicQuerySubmission("<= (LTE)", " <= " + value)
 	}
-	return c
 }
 
 func (c *Client) And(value string) *Client {
-	if c.Query == "" {
-		handleTSQLError("AND")
-	}
-	c.Query += " AND " + value
-	return c
+	return c.handleBasicQuerySubmission("AND", " AND " + value)
 }
 
 func (c *Client) Or(value string) *Client {
-	if c.Query == "" {
-		handleTSQLError("OR")
-	}
-	c.Query += " OR " + value
-	return c
+	return c.handleBasicQuerySubmission("OR", " OR " + value)
 }
 
-
 func (c *Client) Union() *Client {
-	if c.Query == "" {
-		handleTSQLError("UNION")
-	}
-	c.Query += " UNION "
-	return c
+	return c.handleBasicQuerySubmission("UNION", " UNION ")
 }
 
 func (c *Client) UnionAll() *Client {
-	if c.Query == "" {
-		handleTSQLError("UNION ALL")
-	}
-	c.Query += " UNION ALL "
-	return c
+	return c.handleBasicQuerySubmission("UNION ALL", " UNION ALL ")
 }
 
 func (c *Client) IsNotNull() *Client {
-	if c.Query == "" {
-		handleTSQLError("IS NOT NULL")
-	}
-	c.Query += " IS NOT NULL "
-	return c
+	return c.handleBasicQuerySubmission("IS NOT NULL", " IS NOT NULL ")
 }
 
-func (c *Client) GroupBy(vals ...interface{}) *Client {
+func (c *Client) handleVarArgs(queryType string, vals []string) *Client {
 	if c.Query == "" {
-		handleTSQLError("GROUP BY")
+		handleTSQLError(queryType)
 	}
-	c.Query += " GROUP BY "
+	c.Query += queryType
 	for _, v := range vals {
-		c.Query += v.(string) + ","
+		c.Query += v + ","
 	}
 	ql := len(c.Query)
 	if ql > 0 && c.Query[ql-1] == ',' {
 		c.Query = c.Query[:ql-1]
 	}
+	if queryType == " VALUES(" {
+		c.Query += ")"
+	}
 	return c
+}
+
+func (c *Client) GroupBy(vals ...string) *Client {
+	return c.handleVarArgs(" GROUP BY ", vals)
+}
+
+func (c *Client) Values(vals ...string) *Client {
+	return c.handleVarArgs(" VALUES(", vals)
 }
 
 func (c *Client) Limit(amount string) *Client {
-	if c.Query == "" {
-		handleTSQLError("LIMIT")
-	}
-	c.Query += " LIMIT " + amount
-	return c
+	return c.handleBasicQuerySubmission("LIMIT",  " LIMIT " + amount)
 }
 
 func (c *Client) Offset(number string) *Client {
-	if c.Query == "" {
-		handleTSQLError("OFFSET")
-	}
-	c.Query += " OFFSET " + number
-	return c
+	return c.handleBasicQuerySubmission("OFFSET",  " OFFSET " + number)
 }
 
 func (c *Client) OrderBy(value string, asc bool) *Client {
@@ -220,91 +171,40 @@ func (c *Client) OrderBy(value string, asc bool) *Client {
 }
 
 func (c *Client) InsertInto(table string) *Client {
-	if c.Query != "" {
-		handleTSQLError("INSERT")
-	}
 	c.Query += "INSERT INTO " + table
 	return c
 }
 
 func (c *Client) Update(table string) *Client {
-	if c.Query != "" {
-		handleTSQLError("UPDATE")
-	}
-	c.Query += "UPDATE " + table
-	return c
+	return c.handleBasicQuerySubmission("UPDATE", "UPDATE " + table)
 }
 
 func (c *Client) Set(val string) *Client {
-	if c.Query == "" {
-		handleTSQLError("SET")
-	}
-	c.Query += " SET " + val
-	return c
-}
-
-func (c *Client) Values(values ...string) *Client {
-	if c.Query == "" {
-		handleTSQLError("VALUES")
-	}
-	c.Query += " VALUES("
-	for _, s := range values {
-		c.Query += s + ","
-	}
-	ql := len(c.Query)
-	if ql > 0 && c.Query[ql-1] == ',' {
-		c.Query = c.Query[:ql-1]
-	}
-	c.Query += ")"
-	return c
+	return c.handleBasicQuerySubmission("SET", " SET " + val)
 }
 
 func (c *Client) Join(table string) *Client {
-	if c.Query == "" {
-		handleTSQLError("JOIN")
-	}
-	c.Query += " JOIN " + table
-	return c
+	return c.handleBasicQuerySubmission("JOIN", " JOIN " + table)
 }
 
 func (c *Client) LeftOuterJoin(table string) *Client {
-	if c.Query == "" {
-		handleTSQLError("LEFT OUTER JOIN")
-	}
-	c.Query += " LEFT OUTER JOIN " + table
-	return c
+	return c.handleBasicQuerySubmission("LEFT OUTER JOIN", " LEFT OUTER JOIN " + table)
 }
 
 func (c *Client) LeftInnerJoin(table string) *Client {
-	if c.Query == "" {
-		handleTSQLError("LEFT INNER JOIN")
-	}
-	c.Query += " LEFT INNER JOIN " + table
-	return c
+	return c.handleBasicQuerySubmission("LEFT INNER JOIN", " LEFT INNER JOIN " + table)
 }
 
 func (c *Client) RightOuterJoin(table string) *Client {
-	if c.Query == "" {
-		handleTSQLError("RIGHT OUTER JOIN")
-	}
-	c.Query += " RIGHT OUTER JOIN " + table
-	return c
+	return c.handleBasicQuerySubmission("RIGHT OUTER JOIN", " RIGHT OUTER JOIN " + table)
 }
 
 func (c *Client) RightInnerJoin(table string) *Client {
-	if c.Query == "" {
-		handleTSQLError("RIGHT INNER JOIN")
-	}
-	c.Query += " RIGHT INNER JOIN " + table
-	return c
+	return c.handleBasicQuerySubmission("RIGHT INNER JOIN", " RIGHT INNER JOIN " + table)
 }
 
 func (c *Client) On(val string) *Client {
-	if c.Query == "" {
-		handleTSQLError("ON")
-	}
-	c.Query += " ON " + val
-	return c
+	return c.handleBasicQuerySubmission("ON", " ON " + val)
 }
 
 func handleTSQLError(queryType string) {
@@ -342,13 +242,9 @@ func (c *Client) QueryResult(debug bool) (*sql.Rows, error) {
 // Functions
 
 func (c *Client) Lower(val string, quotes bool) *Client {
-	if c.Query == "" {
-		handleTSQLError("LOWER")
-	}
 	if quotes {
-		c.Query += " LOWER('" + val + "')"
+		return c.handleBasicQuerySubmission("LOWER", " LOWER('" + val + "')")
 	} else {
-		c.Query += " LOWER(" + val + ")"
+		return c.handleBasicQuerySubmission("LOWER", " LOWER(" + val + ")")
 	}
-	return c
 }
