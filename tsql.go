@@ -5,7 +5,6 @@ package tsql
 
 import (
 	"database/sql"
-	utils "github.com/TrafficLabel/Go-Utilities"
 	_ "github.com/go-sql-driver/mysql"
 	"log"
 )
@@ -68,8 +67,30 @@ func (c *Client) NotLike(value string, percentSign bool) *Client {
 }
 
 func (c *Client) NotEqual(value int) *Client {
-	return c.handleBasicQuerySubmission("NOT EQUAL (!=)", " != " + utils.String(value))
+	return c.handleBasicQuerySubmission("NOT EQUAL (!=)", " != " + String(value))
 }
+
+func String(n int) string {
+	buf := [11]byte{}
+	pos := len(buf)
+	i := int64(n)
+	signed := i < 0
+	if signed {
+		i = -i
+	}
+	for {
+		pos--
+		buf[pos], i = '0'+byte(i%10), i/10
+		if i == 0 {
+			if signed {
+				pos--
+				buf[pos] = '-'
+			}
+			return string(buf[pos:])
+		}
+	}
+}
+
 
 func (c *Client) LT(value string, quotes bool) *Client {
 	if quotes {
